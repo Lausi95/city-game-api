@@ -1,10 +1,12 @@
 package de.lausi95.misterx.agents
 
+import de.lausi95.misterx.games.GameId
 import org.springframework.security.access.prepost.PreAuthorize
 import java.util.*
 
 data class Agent(
   val id: AgentId,
+  val gameId: GameId,
   val firstName: AgentFirstName,
   val lastName: AgentLastName,
   val phoneNumber: AgentPhoneNumber
@@ -16,6 +18,7 @@ data class AgentLastName(val value: String)
 data class AgentPhoneNumber(val value: String)
 
 data class CreateAgentCommand(
+  val gameId: GameId,
   val firstName: AgentFirstName,
   val lastName: AgentLastName,
   val phoneNumber: AgentPhoneNumber
@@ -31,12 +34,12 @@ data class AgentCreatedEvent(
 
 interface AgentApi {
 
-  @PreAuthorize("hasAuthority('SCOPE_create-agent')")
+  @PreAuthorize("hasAuthority('SCOPE_agents:create')")
   fun createAgent(command: CreateAgentCommand): CreateAgentResult
 
-  @PreAuthorize("hasAuthority('SCOPE_get-agent')")
+  @PreAuthorize("hasAuthority('SCOPE_agents:read')")
   fun getAgent(agentId: AgentId): Agent?
 
-  @PreAuthorize("hasAuthority('SCOPE_get-agents')")
-  fun getAgent(): Agent
+  @PreAuthorize("hasAuthority('SCOPE_agents:read')")
+  fun getAgents(gameId: GameId): Agent
 }

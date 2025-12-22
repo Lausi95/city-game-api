@@ -1,6 +1,7 @@
 package de.lausi95.misterx.agents.adapter.web
 
 import de.lausi95.misterx.agents.*
+import de.lausi95.misterx.games.GameId
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
@@ -22,6 +23,10 @@ class AgentController(
 
     @NotNull
     @NotEmpty
+    var gameId: String,
+
+    @NotNull
+    @NotEmpty
     var lastName: String,
 
     @NotNull
@@ -34,6 +39,7 @@ class AgentController(
     val result = agentApi.createAgent(
       CreateAgentCommand(
         firstName = AgentFirstName(request.firstName),
+        gameId = GameId(request.gameId),
         lastName = AgentLastName(request.lastName),
         phoneNumber = AgentPhoneNumber(request.phoneNumber)
       )

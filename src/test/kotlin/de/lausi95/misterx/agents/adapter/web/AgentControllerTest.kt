@@ -3,6 +3,7 @@ package de.lausi95.misterx.agents.adapter.web
 import com.ninjasquad.springmockk.MockkBean
 import de.lausi95.misterx.agents.AgentApi
 import de.lausi95.misterx.agents.CreateAgentResult
+import de.lausi95.misterx.games.randomGameId
 import de.lausi95.misterx.randomAgent
 import de.lausi95.misterx.randomAgentId
 import io.mockk.every
@@ -35,9 +36,10 @@ class AgentControllerTest(
     @Test
     fun `when endpoint is successfully called, returns 201 CREATED response with location header`() {
       val agentId = randomAgentId()
+      val gameId = randomGameId()
       every { agentApi.createAgent(any()) }.returns(CreateAgentResult(agentId))
 
-      val request = AgentController.CreateAgentRequest("Foo", "Bar", "Baz")
+      val request = AgentController.CreateAgentRequest(gameId.value, "Foo", "Bar", "Baz")
 
       mockMvc.perform(
         post("/agents").with(jwt())

@@ -2,6 +2,7 @@ package de.lausi95.misterx.agents.adapter.postgresql
 
 import de.lausi95.misterx.agents.*
 import de.lausi95.misterx.agents.domain.AgentRepository
+import de.lausi95.misterx.games.GameId
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
@@ -17,6 +18,9 @@ private data class AgentEntity(
   @Column(name = "id")
   val id: String,
 
+  @Column(name = "game_id")
+  val gameId: String,
+
   @Column(name = "first_name", nullable = false)
   val firstName: String,
 
@@ -29,6 +33,7 @@ private data class AgentEntity(
 
   constructor(agent: Agent) : this(
     agent.id.value,
+    agent.gameId.value,
     agent.firstName.value,
     agent.lastName.value,
     agent.phoneNumber.value
@@ -36,6 +41,7 @@ private data class AgentEntity(
 
   fun toAgent(): Agent = Agent(
     AgentId(id),
+    GameId(gameId),
     AgentFirstName(firstName),
     AgentLastName(lastName),
     AgentPhoneNumber(phoneNumber)
