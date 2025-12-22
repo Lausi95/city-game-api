@@ -4,10 +4,9 @@ import de.lausi95.misterx.agents.*
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 
 @RestController
 @RequestMapping("/agents")
@@ -31,13 +30,22 @@ class AgentController(
   )
 
   @PostMapping
-  fun createAgent(@Valid @RequestBody request: CreateAgentRequest) {
-    agentApi.createAgent(
+  fun createAgent(@Valid @RequestBody request: CreateAgentRequest): ResponseEntity<Unit> {
+    val result = agentApi.createAgent(
       CreateAgentCommand(
         firstName = AgentFirstName(request.firstName),
         lastName = AgentLastName(request.lastName),
         phoneNumber = AgentPhoneNumber(request.phoneNumber)
       )
     )
+
+    val uri = ServletUriComponentsBuilder.fromPath("/agents/{agentId}").build(result.agentId.value)
+    return ResponseEntity.created(uri).build()
+  }
+
+  @GetMapping("/{agentId}")
+  fun getAgent(@PathVariable agentId: String): ResponseEntity<AgentResource> {
+    val agent = agentApi.getAgent(AgentId(agentId)) ?: return ResponseEntity.notFound().build()
+    return ResponseEntity.ok(AgentResource(agent))
   }
 }

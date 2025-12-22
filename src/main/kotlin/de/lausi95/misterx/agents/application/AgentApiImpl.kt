@@ -1,13 +1,12 @@
 package de.lausi95.misterx.agents.application
 
 import de.lausi95.misterx.agents.*
-import de.lausi95.misterx.agents.domain.Agent
 import de.lausi95.misterx.agents.domain.AgentRepository
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 
 @Component
-class AgentApiImpl(
+private class AgentApiImpl(
   private val applicationEventPublisher: ApplicationEventPublisher,
   private val agentRepository: AgentRepository
 ) : AgentApi {
@@ -19,5 +18,13 @@ class AgentApiImpl(
 
     applicationEventPublisher.publishEvent(AgentCreatedEvent(agentId))
     return CreateAgentResult(agentId)
+  }
+
+  override fun getAgent(agentId: AgentId): Agent? {
+    TODO("Not yet implemented")
+  }
+
+  override fun getAgent(): Agent {
+    TODO("Not yet implemented")
   }
 }

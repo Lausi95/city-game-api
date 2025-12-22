@@ -48,6 +48,11 @@ dependencies {
   runtimeOnly("org.springframework.modulith:spring-modulith-events-kafka")
   runtimeOnly("org.springframework.modulith:spring-modulith-observability")
 
+  testImplementation("org.springframework.boot:spring-boot-starter-test") {
+    exclude(module = "mockito-junit-jupiter")
+    exclude(module = "mockito-core")
+  }
+  testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
   testImplementation("org.springframework.boot:spring-boot-starter-actuator-test")
   testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
   testImplementation("org.springframework.boot:spring-boot-starter-kafka-test")
@@ -59,6 +64,9 @@ dependencies {
   testImplementation("org.testcontainers:testcontainers-kafka")
   testImplementation("org.testcontainers:testcontainers-postgresql")
   testImplementation("net.datafaker:datafaker:${property("datafakerVersion")}")
+
+  testImplementation("io.mockk:mockk:1.14.7")
+  testImplementation("com.ninja-squad:springmockk:5.0.1")
 
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

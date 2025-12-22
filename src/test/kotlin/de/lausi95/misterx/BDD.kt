@@ -13,12 +13,15 @@ fun randomAgentLastName() = AgentLastName(faker.name().lastName())
 
 fun randomAgentPhoneNumber() = AgentPhoneNumber(faker.phoneNumber().phoneNumber())
 
+fun randomAgent(
+  id: AgentId = randomAgentId(),
+  firstName: AgentFirstName = randomAgentFirstName(),
+  lastName: AgentLastName = randomAgentLastName(),
+  phoneNumber: AgentPhoneNumber = randomAgentPhoneNumber()
+) = Agent(id, firstName, lastName, phoneNumber)
+
 fun randomCreateAgentCommand(
   agentFirstName: AgentFirstName = randomAgentFirstName(),
   agentLastName: AgentLastName = randomAgentLastName(),
   agentPhoneNumber: AgentPhoneNumber = randomAgentPhoneNumber()
-) = CreateAgentCommand(
-  agentFirstName,
-  agentLastName,
-  agentPhoneNumber
-)
+) = CreateAgentCommand(agentFirstName, agentLastName, agentPhoneNumber)

@@ -11,5 +11,4 @@ class MisterxApplicationTests {
   @Test
   fun contextLoads() {
   }
-
 }
