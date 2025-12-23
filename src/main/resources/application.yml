@@ -6,3 +6,13 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: https://auth.tennislichtenberg.de/realms/misterx
+  jpa:
+    open-in-view: false
+  docker:
+    compose:
+      lifecycle-management: start_only
+
+logging:
+  level:
+    root: warn
+    de.lausi95.misterx: debug
