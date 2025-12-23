@@ -22,7 +22,7 @@ repositories {
   mavenCentral()
 }
 
-extra["springModulithVersion"] = "2.0.0"
+extra["springModulithVersion"] = "2.0.1"
 extra["datafakerVersion"] = "2.5.3"
 
 dependencies {
@@ -34,19 +34,16 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-flyway")
   implementation("org.springframework.boot:spring-boot-starter-validation")
 
-  implementation("org.springframework.modulith:spring-modulith-events-api")
-  implementation("org.springframework.modulith:spring-modulith-starter-core")
   implementation("org.springframework.modulith:spring-modulith-starter-jpa")
 
   implementation("org.flywaydb:flyway-database-postgresql")
-
   implementation("org.jetbrains.kotlin:kotlin-reflect")
 
   developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 
   runtimeOnly("org.postgresql:postgresql")
   runtimeOnly("org.springframework.modulith:spring-modulith-actuator")
-  runtimeOnly("org.springframework.modulith:spring-modulith-events-kafka")
+  runtimeOnly("org.springframework.modulith:spring-modulith-events-jpa")
   runtimeOnly("org.springframework.modulith:spring-modulith-observability")
 
   testImplementation("org.springframework.boot:spring-boot-starter-test") {

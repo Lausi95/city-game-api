@@ -29,6 +29,9 @@ private data class AgentEntity(
 
   @Column(name = "phone_number", nullable = false)
   val phoneNumber: String,
+
+  @Column(name = "state", nullable = false)
+  val state: String,
 ) {
 
   constructor(agent: Agent) : this(
@@ -36,7 +39,8 @@ private data class AgentEntity(
     agent.gameId.value,
     agent.firstName.value,
     agent.lastName.value,
-    agent.phoneNumber.value
+    agent.phoneNumber.value,
+    agent.state.name,
   )
 
   fun toAgent(): Agent = Agent(
@@ -44,7 +48,8 @@ private data class AgentEntity(
     GameId(gameId),
     AgentFirstName(firstName),
     AgentLastName(lastName),
-    AgentPhoneNumber(phoneNumber)
+    AgentPhoneNumber(phoneNumber),
+    AgentState.valueOf(state),
   )
 }
 
@@ -57,6 +62,10 @@ private class PostgresAgentRepository(private val agentEntityRepository: AgentEn
   override fun save(agent: Agent) {
     val entity = AgentEntity(agent)
     agentEntityRepository.save(entity)
+  }
+
+  override fun findById(agentId: AgentId): Agent? {
+    return agentEntityRepository.findById(agentId.value).orElse(null)?.toAgent()
   }
 
   override fun findAll(): List<Agent> {

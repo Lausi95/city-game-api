@@ -4,7 +4,7 @@ import de.lausi95.misterx.faker
 
 fun randomGameId() = GameId(faker.internet().uuid())
 
-fun randomGameTitle() = GameTitle(faker.gameOfThrones().city())
+fun randomGameTitle() = GameTitle(faker.internet().uuid())
 
 fun randomGame(
   id: GameId = randomGameId(),

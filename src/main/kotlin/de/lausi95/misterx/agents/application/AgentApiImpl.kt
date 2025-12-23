@@ -5,6 +5,7 @@ import de.lausi95.misterx.agents.domain.AgentRepository
 import de.lausi95.misterx.games.GameId
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
 @Component
 private class AgentApiImpl(
@@ -12,6 +13,7 @@ private class AgentApiImpl(
   private val agentRepository: AgentRepository
 ) : AgentApi {
 
+  @Transactional
   override fun createAgent(command: CreateAgentCommand): CreateAgentResult {
     val agentId = AgentId()
     val agent = Agent(
@@ -20,10 +22,13 @@ private class AgentApiImpl(
       command.firstName,
       command.lastName,
       command.phoneNumber,
+      AgentState.PENDING,
     )
 
     agentRepository.save(agent)
-    applicationEventPublisher.publishEvent(AgentCreatedEvent(agentId))
+    applicationEventPublisher.publishEvent(AgentUpdatedEvent(agentId, "Agent Created."))
+
+    applicationEventPublisher.publishEvent(AgentAssignmentRequestedEvent(agentId, command.gameId))
 
     return CreateAgentResult(agentId)
   }

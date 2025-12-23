@@ -30,5 +30,14 @@ CREATE TABLE agent
     game_id      VARCHAR(255) NOT NULL,
     first_name   VARCHAR(255) NOT NULL,
     last_name    VARCHAR(255) NOT NULL,
-    phone_number VARCHAR(255) NOT NULL
+    phone_number VARCHAR(255) NOT NULL,
+    state        VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE agent_history
+(
+    id         SERIAL PRIMARY KEY,
+    agent_id   VARCHAR(255) NOT NULL REFERENCES agent (id),
+    message    TEXT         NOT NULL,
+    created_at TIMESTAMP    NOT NULL
 );

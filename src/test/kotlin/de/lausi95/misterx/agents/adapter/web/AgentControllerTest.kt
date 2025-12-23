@@ -3,9 +3,9 @@ package de.lausi95.misterx.agents.adapter.web
 import com.ninjasquad.springmockk.MockkBean
 import de.lausi95.misterx.agents.AgentApi
 import de.lausi95.misterx.agents.CreateAgentResult
+import de.lausi95.misterx.agents.randomAgent
+import de.lausi95.misterx.agents.randomAgentId
 import de.lausi95.misterx.games.randomGameId
-import de.lausi95.misterx.randomAgent
-import de.lausi95.misterx.randomAgentId
 import io.mockk.every
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested

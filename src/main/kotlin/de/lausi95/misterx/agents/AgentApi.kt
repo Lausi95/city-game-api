@@ -2,14 +2,22 @@ package de.lausi95.misterx.agents
 
 import de.lausi95.misterx.games.GameId
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
+
+enum class AgentState {
+  PENDING,
+  ASSIGNED,
+  REJECTED
+}
 
 data class Agent(
   val id: AgentId,
   val gameId: GameId,
   val firstName: AgentFirstName,
   val lastName: AgentLastName,
-  val phoneNumber: AgentPhoneNumber
+  val phoneNumber: AgentPhoneNumber,
+  var state: AgentState,
 )
 
 data class AgentId(val value: String = UUID.randomUUID().toString())
@@ -25,21 +33,41 @@ data class CreateAgentCommand(
 )
 
 data class CreateAgentResult(
-  val agentId: AgentId
+  val agentId: AgentId,
 )
 
-data class AgentCreatedEvent(
-  val agentId: AgentId
+data class AgentAssignmentRequestedEvent(
+  val agentId: AgentId,
+  val gameId: GameId,
+)
+
+data class AgentAssignmentAcceptedEvent(
+  val agentId: AgentId,
+  val gameId: GameId,
+)
+
+data class AgentAssignmentRejectedEvent(
+  val agentId: AgentId,
+  val gameId: GameId,
+  val reason: String,
+)
+
+data class AgentUpdatedEvent(
+  val agentId: AgentId,
+  val message: String,
 )
 
 interface AgentApi {
 
   @PreAuthorize("hasAuthority('SCOPE_agents:create')")
+  @Transactional
   fun createAgent(command: CreateAgentCommand): CreateAgentResult
 
   @PreAuthorize("hasAuthority('SCOPE_agents:read')")
+  @Transactional
   fun getAgent(agentId: AgentId): Agent?
 
   @PreAuthorize("hasAuthority('SCOPE_agents:read')")
+  @Transactional
   fun getAgents(gameId: GameId): Agent
 }
