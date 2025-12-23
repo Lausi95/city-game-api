@@ -1,0 +1,18 @@
+name: test.yml
+on:
+  push:
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - id: Checkout
+        uses: actions/checkout@v6
+      - id: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+      - id: Run Tests
+        run: ./gradlew test
