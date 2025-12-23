@@ -7,12 +7,12 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     steps:
-      - id: Checkout
+      - name: Checkout
         uses: actions/checkout@v6
-      - id: Setup Java
+      - name: Setup Java
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
-      - id: Run Tests
+      - name: Run Tests
         run: ./gradlew test
