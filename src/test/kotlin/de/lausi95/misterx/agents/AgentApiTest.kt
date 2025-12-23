@@ -20,7 +20,7 @@ class AgentApiTest(
 
   @Nested
   @DisplayName("createAgent()")
-  @WithMockUser(authorities = ["SCOPE_create-agent"])
+  @WithMockUser(authorities = ["SCOPE_agents:create"])
   inner class CreateAgent {
 
     @Test
