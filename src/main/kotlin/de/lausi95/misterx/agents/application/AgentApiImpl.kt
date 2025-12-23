@@ -14,11 +14,17 @@ private class AgentApiImpl(
 
   override fun createAgent(command: CreateAgentCommand): CreateAgentResult {
     val agentId = AgentId()
-    val agent =
-      Agent(agentId, command.gameId, command.firstName, command.lastName, command.phoneNumber)
-    agentRepository.save(agent)
+    val agent = Agent(
+      agentId,
+      command.gameId,
+      command.firstName,
+      command.lastName,
+      command.phoneNumber,
+    )
 
+    agentRepository.save(agent)
     applicationEventPublisher.publishEvent(AgentCreatedEvent(agentId))
+
     return CreateAgentResult(agentId)
   }
 
