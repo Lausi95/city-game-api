@@ -1,17 +1,17 @@
 package de.lausi95.misterx.agents.application
 
-import de.lausi95.misterx.ErrorEvent
+import de.lausi95.misterx.agents.AgentUpdatedEvent
 import org.slf4j.LoggerFactory
 import org.springframework.modulith.events.ApplicationModuleListener
 import org.springframework.stereotype.Component
 
 @Component
-class ErrorEventListener {
+class AgentUpdatedEventListener {
 
-  private val log = LoggerFactory.getLogger("error")
+  private val log = LoggerFactory.getLogger("agent-updated")
 
   @ApplicationModuleListener
-  fun onErrorEvent(event: ErrorEvent) {
-    log.warn("{}", event)
+  fun onAgentUpdatedEvent(event: AgentUpdatedEvent) {
+    log.debug("{}", event)
   }
 }

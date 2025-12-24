@@ -1,9 +1,19 @@
 package de.lausi95.misterx.agents
 
 import de.lausi95.misterx.games.GameId
+import org.springframework.modulith.ApplicationModule
+import org.springframework.modulith.PackageInfo
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
+
+@ApplicationModule(
+  id = "agents",
+  displayName = "Agents"
+)
+@PackageInfo
+class ModuleMetadata {}
 
 enum class AgentState {
   PENDING,
@@ -57,17 +67,12 @@ data class AgentUpdatedEvent(
   val message: String,
 )
 
-interface AgentApi {
+@Component
+class AgentApi(private val createAgentService: CreateAgentService) : CreateAgentService by createAgentService
 
+interface CreateAgentService {
+
+  @Transactional
   @PreAuthorize("hasAuthority('SCOPE_agents:create')")
-  @Transactional
   fun createAgent(command: CreateAgentCommand): CreateAgentResult
-
-  @PreAuthorize("hasAuthority('SCOPE_agents:read')")
-  @Transactional
-  fun getAgent(agentId: AgentId): Agent?
-
-  @PreAuthorize("hasAuthority('SCOPE_agents:read')")
-  @Transactional
-  fun getAgents(gameId: GameId): Agent
 }

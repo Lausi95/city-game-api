@@ -1,9 +1,9 @@
 package de.lausi95.misterx.agents.application
 
+import de.lausi95.misterx.ErrorEvent
 import de.lausi95.misterx.agents.AgentAssignmentRejectedEvent
 import de.lausi95.misterx.agents.AgentState
 import de.lausi95.misterx.agents.AgentUpdatedEvent
-import de.lausi95.misterx.agents.MisterxErrorEvent
 import de.lausi95.misterx.agents.domain.AgentRepository
 import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
@@ -25,7 +25,7 @@ class AgentAssignmentRejectedEventListener(
     if (agent == null) {
       log.warn("Agent is null.")
       applicationEventPublisher.publishEvent(
-        MisterxErrorEvent(
+        ErrorEvent(
           "agent-not-found",
           "onAgentAssignmentRejected",
           "Agent ${event.agentId} not found.",
@@ -38,7 +38,7 @@ class AgentAssignmentRejectedEventListener(
     if (agent.state != AgentState.PENDING) {
       log.warn("Agent has wrong state.")
       applicationEventPublisher.publishEvent(
-        MisterxErrorEvent(
+        ErrorEvent(
           "agent-not-pending",
           "onAgentAssignmentRejected",
           "Agent ${event.agentId} is not in status 'PENDING', actual state: ${agent.state}.",

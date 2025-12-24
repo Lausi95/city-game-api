@@ -6,7 +6,10 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 
 @RestController
@@ -47,11 +50,5 @@ class AgentController(
 
     val uri = ServletUriComponentsBuilder.fromPath("/agents/{agentId}").build(result.agentId.value)
     return ResponseEntity.created(uri).build()
-  }
-
-  @GetMapping("/{agentId}")
-  fun getAgent(@PathVariable agentId: String): ResponseEntity<AgentResource> {
-    val agent = agentApi.getAgent(AgentId(agentId)) ?: return ResponseEntity.notFound().build()
-    return ResponseEntity.ok(AgentResource(agent))
   }
 }

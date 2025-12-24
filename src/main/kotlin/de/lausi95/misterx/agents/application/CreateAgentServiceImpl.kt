@@ -2,18 +2,17 @@ package de.lausi95.misterx.agents.application
 
 import de.lausi95.misterx.agents.*
 import de.lausi95.misterx.agents.domain.AgentRepository
-import de.lausi95.misterx.games.GameId
 import org.springframework.context.ApplicationEventPublisher
-import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Transactional
+import org.springframework.context.annotation.Primary
+import org.springframework.stereotype.Service
 
-@Component
-private class AgentApiImpl(
+@Primary
+@Service
+class CreateAgentServiceImpl(
   private val applicationEventPublisher: ApplicationEventPublisher,
   private val agentRepository: AgentRepository
-) : AgentApi {
+) : CreateAgentService {
 
-  @Transactional
   override fun createAgent(command: CreateAgentCommand): CreateAgentResult {
     val agentId = AgentId()
     val agent = Agent(
@@ -31,13 +30,5 @@ private class AgentApiImpl(
     applicationEventPublisher.publishEvent(AgentAssignmentRequestedEvent(agentId, command.gameId))
 
     return CreateAgentResult(agentId)
-  }
-
-  override fun getAgent(agentId: AgentId): Agent? {
-    TODO("Not yet implemented")
-  }
-
-  override fun getAgents(gameId: GameId): Agent {
-    TODO("Not yet implemented")
   }
 }

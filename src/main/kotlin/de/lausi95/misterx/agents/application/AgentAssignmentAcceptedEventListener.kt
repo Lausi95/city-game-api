@@ -1,9 +1,9 @@
 package de.lausi95.misterx.agents.application
 
+import de.lausi95.misterx.ErrorEvent
 import de.lausi95.misterx.agents.AgentAssignmentAcceptedEvent
 import de.lausi95.misterx.agents.AgentState
 import de.lausi95.misterx.agents.AgentUpdatedEvent
-import de.lausi95.misterx.agents.MisterxErrorEvent
 import de.lausi95.misterx.agents.domain.AgentRepository
 import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
@@ -21,25 +21,34 @@ class AgentAssignmentAcceptedEventListener(
 
   @ApplicationModuleListener
   fun onAgentAssignmentAccepted(event: AgentAssignmentAcceptedEvent) {
-    agentRepository.findById(event.agentId)?.let { agent ->
-      if (agent.state != AgentState.PENDING) {
-        return
-      }
-
-      agent.state = AgentState.ASSIGNED
-
-      agentRepository.save(agent)
-
-      applicationEventPublisher.publishEvent(AgentUpdatedEvent(agent.id, "Agent Assigned."))
-    } ?: run {
+    val agent = agentRepository.findById(event.agentId)
+    if (agent == null) {
       applicationEventPublisher.publishEvent(
-        MisterxErrorEvent(
+        ErrorEvent(
           "agent-not-found",
           "onAgentAssignmentAccepted",
           "Agent ${event.agentId} not found.",
           LocalDateTime.now()
         )
       )
+      return
     }
+
+    if (agent.state != AgentState.PENDING) {
+      applicationEventPublisher.publishEvent(
+        ErrorEvent(
+          "agent-not-pending",
+          "onAgentAssignmentAccepted",
+          "Agent ${event.agentId} is not in status 'PENDING', actual state: ${agent.state}.",
+          LocalDateTime.now()
+        )
+      )
+      return
+    }
+
+    agent.state = AgentState.ASSIGNED
+
+    agentRepository.save(agent)
+    applicationEventPublisher.publishEvent(AgentUpdatedEvent(agent.id, "Agent Assigned."))
   }
 }
