@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
-      url: https://tennislichtenberg.de
+      url: https://misterx.lausi95.net
     steps:
       - uses: actions/checkout@v6
       - name: Setup SSH
