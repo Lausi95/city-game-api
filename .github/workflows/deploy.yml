@@ -8,12 +8,12 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     env:
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      DOCKER_IMAGE: lausi95/city-game-api:latest
+      DOCKER_USERNAME: tomlausmann@gmail.com
+      DOCKER_PASSWORD: ${{ secrets.GH_TOKEN }}
+      DOCKER_IMAGE: ghcr.io/lausi95/city-game-api/city-game-api:latest
     steps:
       - uses: actions/checkout@v6
-      - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      - run: echo $DOCKER_PASSWORD | docker login ghcr.io -u $DOCKER_USERNAME --password-stdin
       - run: docker build -t $DOCKER_IMAGE .
       - run: docker push $DOCKER_IMAGE
 
