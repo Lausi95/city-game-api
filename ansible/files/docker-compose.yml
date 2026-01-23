@@ -1,6 +1,6 @@
 services:
   city-game-api:
-    image: lausi95/city-game-api
+    image: ghcr.io/Lausi95/city-game-api/city-game-api:latest
     networks: [ traefik ]
     environment:
       SPRING_PROFILES_ACTIVE: k8s
