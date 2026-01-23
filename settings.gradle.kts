@@ -1,1 +1,1 @@
-rootProject.name = "misterx"
+rootProject.name = "city-game-api"

@@ -1,4 +1,4 @@
-package de.lausi95.misterx
+package de.citygame
 
 import net.datafaker.Faker
 

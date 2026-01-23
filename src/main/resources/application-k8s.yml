@@ -4,4 +4,4 @@ logging:
       console: ecs
   level:
     root: warn
-    de.lausi95.misterx: warn
+    de.lausi95.citygame: info

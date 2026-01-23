@@ -1,0 +1,22 @@
+services:
+  city-game-api:
+    image: lausi95/city-game-api
+    networks: [ traefik ]
+    environment:
+      SPRING_PROFILES_ACTIVE: k8s
+      SPRING_DATASOURCE_URL: jdbc:postgresql://city-game-api-postgres:5432/city-game
+      SPRING_DATASOURCE_USERNAME: city-game
+      SPRING_DATASOURCE_PASSWORD: city-game
+
+  city-game-api-postgres:
+    image: 'postgres:latest'
+    networks: [ traefik ]
+    environment:
+      POSTGRES_DB: city-game
+      POSTGRES_PASSWORD: city-game
+      POSTGRES_USER: city-game
+
+networks:
+  traefik:
+    external: true
+    name: traefik
