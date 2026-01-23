@@ -23,7 +23,6 @@ repositories {
 }
 
 extra["springModulithVersion"] = "2.0.1"
-extra["datafakerVersion"] = "2.5.3"
 extra["mockkVersion"] = "1.14.7"
 extra["springmockkVersion"] = "5.0.1"
 extra["qrcodegenVersion"] = "1.8.0"
@@ -54,14 +53,11 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-starter-actuator-test")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-kafka-test")
     testImplementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")
-    testImplementation("org.testcontainers:testcontainers-kafka")
     testImplementation("org.testcontainers:testcontainers-postgresql")
-    testImplementation("net.datafaker:datafaker:${property("datafakerVersion")}")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("io.nayuki:qrcodegen:${property("qrcodegenVersion")}")
