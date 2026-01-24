@@ -1,4 +1,4 @@
-package de.citygame
+package net.lausi95.citygame
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

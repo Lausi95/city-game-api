@@ -1,4 +1,4 @@
-package de.citygame.infrastructure.web
+package net.lausi95.citygame.infrastructure.web
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

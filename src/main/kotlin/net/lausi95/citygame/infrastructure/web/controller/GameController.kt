@@ -1,4 +1,4 @@
-package de.citygame.infrastructure.web.controller
+package net.lausi95.citygame.infrastructure.web.controller
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.web.bind.annotation.PostMapping
