@@ -103,4 +103,21 @@ class GameControllerTest {
             jsonPath("$.details", equalTo("Input Error: Invalid JSON"))
         }
     }
+
+    @Test
+    fun `should respond with bad request, when use case throws an illegal argument exception`() {
+        every { createGameUseCase(any()) }.throws(IllegalArgumentException("Something went wrong"))
+        mockMvc.post("/games") {
+            contentType = MediaType.APPLICATION_JSON
+            with(jwt())
+            content = """
+                {
+                    "title": "hallo"
+                }
+            """.trimIndent()
+        }.andExpect {
+            status { isBadRequest() }
+            jsonPath("$.details", equalTo("Something went wrong"))
+        }
+    }
 }
