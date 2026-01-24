@@ -7,21 +7,18 @@ import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
-import java.util.*
 
 private val log = KotlinLogging.logger { }
 
 @RestControllerAdvice
-class HttpExceptionHandler(
-    private val messageSource: MessageSource
-) {
+class HttpExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleMethodArgumentNotValidException(ex: MethodArgumentNotValidException): ProblemDetail {
         val details = ProblemDetail.forStatus(400)
         details.setProperty("details", "Validation Error")
         ex.bindingResult.fieldErrors.forEach {
-            details.setProperty(it.field, getMessage(it.defaultMessage))
+            details.setProperty(it.field, it.defaultMessage ?: "Invalid Value")
         }
         return details
     }
@@ -34,21 +31,16 @@ class HttpExceptionHandler(
         return problemDetail
     }
 
+    @ExceptionHandler(IllegalArgumentException::class)
+    fun handleIllegalArgumentException(ex: IllegalArgumentException): ProblemDetail {
+        val problemDetail = ProblemDetail.forStatus(400)
+        problemDetail.setProperty("details", ex.message)
+        return problemDetail
+    }
+
     @ExceptionHandler
     fun handleException(ex: Exception): ProblemDetail {
         log.error(ex) { "Unexpected Error (${ex.javaClass.simpleName}): ${ex.message}" }
         return ProblemDetail.forStatus(500)
-    }
-
-    fun getMessage(code: String?): String {
-        if (code == null) {
-            return "Invalid Value"
-        }
-        try {
-            return messageSource.getMessage(code, arrayOf(), Locale.getDefault())
-        } catch (ex: Exception) {
-            log.error(ex) { "Invalid i18n code: $code" }
-            return "Invalid Value"
-        }
     }
 }

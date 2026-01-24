@@ -8,6 +8,6 @@ data class CreateGameRequestDto(
 
     @field:Parameter(name = "title", description = "Title of the game", required = true)
     @field:JsonProperty("title")
-    @field:NotEmpty(message = "endpoint.create-game.validation.title.not-empty")
+    @field:NotEmpty(message = "'title' cannot be null or empty")
     var title: String?
 )
