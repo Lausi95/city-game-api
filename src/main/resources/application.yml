@@ -1,3 +1,5 @@
+keycloak-realm: ${KEYCLOAK_REALM:https://auth.tennislichtenberg.de/relams/city-game}
+
 spring:
   application:
     name: misterx
@@ -5,7 +7,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://auth.tennislichtenberg.de/realms/misterx
+          issuer-uri: ${keycloak-realm}
   jpa:
     open-in-view: false
   docker:
