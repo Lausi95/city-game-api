@@ -5,6 +5,7 @@ import net.lausi95.citygame.domain.game.Game
 import net.lausi95.citygame.domain.game.GameId
 import net.lausi95.citygame.domain.game.GameRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 private val log = KotlinLogging.logger { }
 
@@ -13,6 +14,7 @@ class CreateGameUseCase(
     private val gameRepository: GameRepository,
 ) {
 
+    @Transactional
     operator fun invoke(request: CreateGameRequest): CreateGameResponse {
         require(!gameRepository.existsByTitle(request.title)) {
             "Game with title already exist. Title: '${request.title}'"
