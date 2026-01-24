@@ -7,6 +7,11 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://city-game-api-postgres:5432/city-game
       SPRING_DATASOURCE_USERNAME: city-game
       SPRING_DATASOURCE_PASSWORD: city-game
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.tcm.rule=Host(`misterx.lausi95.net`)
+      - traefik.http.routers.tcm.entrypoints=websecure
+      - traefik.http.routers.tcm.tls.certresolver=letsencrypt
 
   city-game-api-postgres:
     image: 'postgres:latest'
