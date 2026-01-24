@@ -3,6 +3,8 @@
   hosts: all
   vars:
     directory: ~/misterx.lausi95.net
+    docker_username: "{{ lookup('env', 'DOCKER_USERNAME') }}"
+    docker_password: "{{ lookup('env', 'DOCKER_PASSWORD') }}"
   tasks:
     - name: application directory
       file:
@@ -13,6 +15,12 @@
       copy:
         src: "files/"
         dest: "{{ directory }}/"
+
+    - name: Login to Docker registry
+      community.docker.docker_login:
+        registry_url: "ghcr.io"
+        username: "{{ docker_username }}"
+        password: "{{ docker_password }}"
 
     - name: pull images
       shell:

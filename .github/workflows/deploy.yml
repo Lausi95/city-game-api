@@ -21,6 +21,9 @@ jobs:
     name: Deploy
     needs: [ build ]
     runs-on: ubuntu-latest
+    env:
+      DOCKER_USERNAME: tomlausmann@gmail.com
+      DOCKER_PASSWORD: ${{ secrets.GH_TOKEN }}
     environment:
       name: production
       url: https://misterx.lausi95.net
