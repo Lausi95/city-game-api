@@ -17,7 +17,7 @@ spring:
 logging:
   level:
     root: warn
-    de.lausi95.citygame: debug
+    net.lausi95.citygame: debug
   include-application-group: false
   include-application-name: false
 
