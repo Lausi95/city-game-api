@@ -8,9 +8,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.validation.Valid
 import net.lausi95.citygame.application.usecase.creategame.CreateGameRequest
 import net.lausi95.citygame.application.usecase.creategame.CreateGameUseCase
+import net.lausi95.citygame.application.usecase.getgame.GetGameUseCase
 import net.lausi95.citygame.domain.game.GameId
 import net.lausi95.citygame.domain.game.GameTitle
-import net.lausi95.citygame.domain.game.gameNotFound
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -19,7 +19,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 @RestController
 @RequestMapping("/games")
 class GameController(
-    private val createGameUseCase: CreateGameUseCase
+    private val createGameUseCase: CreateGameUseCase,
+    private val getGameUseCase: GetGameUseCase,
 ) {
 
     @PostMapping
@@ -59,7 +60,8 @@ class GameController(
     @GetMapping("/{gameId}")
     fun getGame(
         @PathVariable gameId: String
-    ) {
-        gameNotFound(GameId(gameId))
+    ): GameResource {
+        val game = getGameUseCase(GameId(gameId))
+        return GameResource(game)
     }
 }

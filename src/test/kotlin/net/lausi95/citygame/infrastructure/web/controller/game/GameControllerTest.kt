@@ -7,8 +7,11 @@ import io.mockk.verify
 import net.lausi95.citygame.application.usecase.creategame.CreateGameRequest
 import net.lausi95.citygame.application.usecase.creategame.CreateGameResponse
 import net.lausi95.citygame.application.usecase.creategame.CreateGameUseCase
+import net.lausi95.citygame.application.usecase.getgame.GetGameUseCase
 import net.lausi95.citygame.domain.DomainException
+import net.lausi95.citygame.domain.game.Game
 import net.lausi95.citygame.domain.game.GameId
+import net.lausi95.citygame.domain.game.GameNotFoundException
 import net.lausi95.citygame.domain.game.GameTitle
 import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.CoreMatchers.equalTo
@@ -31,6 +34,9 @@ class GameControllerTest {
 
     @MockkBean
     private lateinit var createGameUseCase: CreateGameUseCase
+
+    @MockkBean
+    private lateinit var getGameUseCase: GetGameUseCase
 
     @Nested
     @DisplayName("POST /games")
@@ -135,11 +141,26 @@ class GameControllerTest {
         @Test
         fun `should response with not found, when game with given id does not exist`() {
             val gameId = GameId.random()
+            every { getGameUseCase(gameId) }.throws(GameNotFoundException("Game not found"))
             mockMvc.get("/games/{gameId}", gameId.value) {
                 with(jwt())
             }.andExpect {
                 status { isNotFound() }
-                jsonPath("$.details", equalTo("Game not found: $gameId"))
+                jsonPath("$.details", equalTo("Game not found"))
+            }
+        }
+
+        @Test
+        fun `should response with game resource, when the requested game does exist`() {
+            val game = Game(GameId("some-game-id"), GameTitle("some game title"))
+            every { getGameUseCase(game.id) }.answers { game }
+            mockMvc.get("/games/{gameId}", game.id) {
+                with(jwt())
+            }.andExpect {
+                status { isOk() }
+                jsonPath("$.id", equalTo("some-game-id"))
+                jsonPath("$.title", equalTo("some game title"))
+                jsonPath("$.links.self", equalTo("/games/some-game-id"))
             }
         }
     }
