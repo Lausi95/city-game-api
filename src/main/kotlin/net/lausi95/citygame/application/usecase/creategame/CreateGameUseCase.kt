@@ -4,6 +4,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import net.lausi95.citygame.domain.game.Game
 import net.lausi95.citygame.domain.game.GameId
 import net.lausi95.citygame.domain.game.GameRepository
+import net.lausi95.citygame.domain.game.gameTitleAlreadyExists
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -16,8 +17,8 @@ class CreateGameUseCase(
 
     @Transactional
     operator fun invoke(request: CreateGameRequest): CreateGameResponse {
-        require(!gameRepository.existsByTitle(request.title)) {
-            "Game with title already exist. Title: '${request.title}'"
+        if (gameRepository.existsByTitle(request.title)) {
+            gameTitleAlreadyExists(request.title)
         }
 
         val game = Game(GameId.random(), request.title)
