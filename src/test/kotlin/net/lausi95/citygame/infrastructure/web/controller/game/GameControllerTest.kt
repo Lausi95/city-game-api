@@ -4,10 +4,10 @@ import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.slot
 import io.mockk.verify
-import net.lausi95.citygame.application.usecase.creategame.CreateGameRequest
-import net.lausi95.citygame.application.usecase.creategame.CreateGameResponse
-import net.lausi95.citygame.application.usecase.creategame.CreateGameUseCase
-import net.lausi95.citygame.application.usecase.getgame.GetGameUseCase
+import net.lausi95.citygame.application.usecase.game.creategame.CreateGameRequest
+import net.lausi95.citygame.application.usecase.game.creategame.CreateGameResponse
+import net.lausi95.citygame.application.usecase.game.creategame.CreateGameUseCase
+import net.lausi95.citygame.application.usecase.game.getgame.GetGameUseCase
 import net.lausi95.citygame.domain.DomainException
 import net.lausi95.citygame.domain.game.Game
 import net.lausi95.citygame.domain.game.GameId

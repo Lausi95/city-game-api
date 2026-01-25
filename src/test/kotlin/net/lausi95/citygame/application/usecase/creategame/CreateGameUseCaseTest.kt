@@ -5,6 +5,8 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.slot
 import io.mockk.verify
+import net.lausi95.citygame.application.usecase.game.creategame.CreateGameRequest
+import net.lausi95.citygame.application.usecase.game.creategame.CreateGameUseCase
 import net.lausi95.citygame.domain.game.Game
 import net.lausi95.citygame.domain.game.GameRepository
 import net.lausi95.citygame.domain.game.GameTitle

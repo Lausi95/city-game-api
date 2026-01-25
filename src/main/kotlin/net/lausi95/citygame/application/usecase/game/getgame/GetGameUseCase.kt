@@ -1,4 +1,4 @@
-package net.lausi95.citygame.application.usecase.getgame
+package net.lausi95.citygame.application.usecase.game.getgame
 
 import net.lausi95.citygame.domain.game.Game
 import net.lausi95.citygame.domain.game.GameId

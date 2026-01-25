@@ -1,4 +1,4 @@
-package net.lausi95.citygame.application.usecase.creategame
+package net.lausi95.citygame.application.usecase.game.creategame
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import net.lausi95.citygame.domain.game.Game

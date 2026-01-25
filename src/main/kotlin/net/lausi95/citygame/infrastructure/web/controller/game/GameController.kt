@@ -6,9 +6,9 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.validation.Valid
-import net.lausi95.citygame.application.usecase.creategame.CreateGameRequest
-import net.lausi95.citygame.application.usecase.creategame.CreateGameUseCase
-import net.lausi95.citygame.application.usecase.getgame.GetGameUseCase
+import net.lausi95.citygame.application.usecase.game.creategame.CreateGameRequest
+import net.lausi95.citygame.application.usecase.game.creategame.CreateGameUseCase
+import net.lausi95.citygame.application.usecase.game.getgame.GetGameUseCase
 import net.lausi95.citygame.domain.game.GameId
 import net.lausi95.citygame.domain.game.GameTitle
 import org.springframework.http.ProblemDetail
