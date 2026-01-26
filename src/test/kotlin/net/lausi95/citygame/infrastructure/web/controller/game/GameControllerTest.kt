@@ -4,19 +4,26 @@ import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.slot
 import io.mockk.verify
-import net.lausi95.citygame.application.usecase.creategame.CreateGameRequest
-import net.lausi95.citygame.application.usecase.creategame.CreateGameResponse
-import net.lausi95.citygame.application.usecase.creategame.CreateGameUseCase
+import net.lausi95.citygame.application.usecase.game.creategame.CreateGameRequest
+import net.lausi95.citygame.application.usecase.game.creategame.CreateGameResponse
+import net.lausi95.citygame.application.usecase.game.creategame.CreateGameUseCase
+import net.lausi95.citygame.application.usecase.game.getgame.GetGameUseCase
+import net.lausi95.citygame.domain.DomainException
+import net.lausi95.citygame.domain.game.Game
 import net.lausi95.citygame.domain.game.GameId
+import net.lausi95.citygame.domain.game.GameNotFoundException
 import net.lausi95.citygame.domain.game.GameTitle
 import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.CoreMatchers.equalTo
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 
 @WebMvcTest(GameController::class)
@@ -28,96 +35,133 @@ class GameControllerTest {
     @MockkBean
     private lateinit var createGameUseCase: CreateGameUseCase
 
-    @Test
-    fun `should map pass request to use case and responds with 201 and location header with id from use case`() {
-        val createGameResponse = CreateGameResponse(
-            gameId = GameId("some-game-id")
-        )
-        every { createGameUseCase(any()) }.answers { createGameResponse }
+    @MockkBean
+    private lateinit var getGameUseCase: GetGameUseCase
 
-        mockMvc.post("/games") {
-            contentType = MediaType.APPLICATION_JSON
-            with(jwt())
-            content = /* language=json */ """
+    @Nested
+    @DisplayName("POST /games")
+    inner class PostGame {
+        @Test
+        fun `should map pass request to use case and responds with 201 and location header with id from use case`() {
+            val createGameResponse = CreateGameResponse(
+                gameId = GameId("some-game-id")
+            )
+            every { createGameUseCase(any()) }.answers { createGameResponse }
+
+            mockMvc.post("/games") {
+                contentType = MediaType.APPLICATION_JSON
+                with(jwt())
+                content = /* language=json */ """
                 {
                     "title": "City-Game Luckenwalde 2026"
                 }
             """.trimIndent()
-        }.andExpect {
-            status { isCreated() }
-            header {
-                stringValues("location", "http://localhost/games/some-game-id")
+            }.andExpect {
+                status { isCreated() }
+                header {
+                    stringValues("location", "http://localhost/games/some-game-id")
+                }
+            }
+
+            val createGameRequest = slot<CreateGameRequest>()
+            verify { createGameUseCase(capture(createGameRequest)) }
+
+            assertThat(createGameRequest.captured.title).isEqualTo(GameTitle("City-Game Luckenwalde 2026"))
+        }
+
+        @Test
+        fun `should respond with bad request, when title is not present`() {
+            mockMvc.post("/games") {
+                contentType = MediaType.APPLICATION_JSON
+                with(jwt())
+                content = /* language=json */ """
+                {
+                }
+            """.trimIndent()
+            }.andExpect {
+                status { isBadRequest() }
+                jsonPath("$.details", equalTo("Validation Error"))
+                jsonPath("$.title", equalTo("'title' cannot be null or empty"))
             }
         }
 
-        val createGameRequest = slot<CreateGameRequest>()
-        verify { createGameUseCase(capture(createGameRequest)) }
-
-        assertThat(createGameRequest.captured.title).isEqualTo(GameTitle("City-Game Luckenwalde 2026"))
-    }
-
-    @Test
-    fun `should respond with bad request, when title is not present`() {
-        mockMvc.post("/games") {
-            contentType = MediaType.APPLICATION_JSON
-            with(jwt())
-            content = /* language=json */ """
-                {
-                }
-            """.trimIndent()
-        }.andExpect {
-            status { isBadRequest() }
-            jsonPath("$.details", equalTo("Validation Error"))
-            jsonPath("$.title", equalTo("'title' cannot be null or empty"))
-        }
-    }
-
-    @Test
-    fun `should respond with bad request, when title is empty string`() {
-        mockMvc.post("/games") {
-            contentType = MediaType.APPLICATION_JSON
-            with(jwt())
-            content = /* language=json */ """
+        @Test
+        fun `should respond with bad request, when title is empty string`() {
+            mockMvc.post("/games") {
+                contentType = MediaType.APPLICATION_JSON
+                with(jwt())
+                content = /* language=json */ """
                 {
                     "title": ""
                 }
             """.trimIndent()
-        }.andExpect {
-            status { isBadRequest() }
-            jsonPath("$.details", equalTo("Validation Error"))
-            jsonPath("$.title", equalTo("'title' cannot be null or empty"))
+            }.andExpect {
+                status { isBadRequest() }
+                jsonPath("$.details", equalTo("Validation Error"))
+                jsonPath("$.title", equalTo("'title' cannot be null or empty"))
+            }
         }
-    }
 
-    @Test
-    fun `should response with bad request, when request is no valid json`() {
-        mockMvc.post("/games") {
-            contentType = MediaType.APPLICATION_JSON
-            with(jwt())
-            content = """
+        @Test
+        fun `should response with bad request, when request is no valid json`() {
+            mockMvc.post("/games") {
+                contentType = MediaType.APPLICATION_JSON
+                with(jwt())
+                content = """
                     "title": ""
                 }
             """.trimIndent()
-        }.andExpect {
-            status { isBadRequest() }
-            jsonPath("$.details", equalTo("Input Error: Invalid JSON"))
+            }.andExpect {
+                status { isBadRequest() }
+                jsonPath("$.details", equalTo("Input Error: Invalid JSON"))
+            }
         }
-    }
 
-    @Test
-    fun `should respond with bad request, when use case throws an illegal argument exception`() {
-        every { createGameUseCase(any()) }.throws(IllegalArgumentException("Something went wrong"))
-        mockMvc.post("/games") {
-            contentType = MediaType.APPLICATION_JSON
-            with(jwt())
-            content = """
+        @Test
+        fun `should respond with bad request, when use case throws an illegal argument exception`() {
+            every { createGameUseCase(any()) }.throws(DomainException("Something went wrong"))
+            mockMvc.post("/games") {
+                contentType = MediaType.APPLICATION_JSON
+                with(jwt())
+                content = """
                 {
                     "title": "hallo"
                 }
             """.trimIndent()
-        }.andExpect {
-            status { isBadRequest() }
-            jsonPath("$.details", equalTo("Something went wrong"))
+            }.andExpect {
+                status { isBadRequest() }
+                jsonPath("$.details", equalTo("Something went wrong"))
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /games/{gameId}")
+    inner class GetGame {
+        @Test
+        fun `should response with not found, when game with given id does not exist`() {
+            val gameId = GameId.random()
+            every { getGameUseCase(gameId) }.throws(GameNotFoundException("Game not found"))
+            mockMvc.get("/games/{gameId}", gameId.value) {
+                with(jwt())
+            }.andExpect {
+                status { isNotFound() }
+                jsonPath("$.details", equalTo("Game not found"))
+            }
+        }
+
+        @Test
+        fun `should response with game resource, when the requested game does exist`() {
+            val game = Game(GameId("some-game-id"), GameTitle("some game title"))
+            every { getGameUseCase(game.id) }.answers { game }
+            mockMvc.get("/games/{gameId}", game.id) {
+                with(jwt())
+            }.andExpect {
+                status { isOk() }
+                jsonPath("$.id", equalTo("some-game-id"))
+                jsonPath("$.title", equalTo("some game title"))
+                jsonPath("$.links.self", equalTo("/games/some-game-id"))
+            }
         }
     }
 }
