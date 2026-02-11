@@ -16,17 +16,17 @@ class CreateGameUseCase(
 ) {
 
     @Transactional
-    operator fun invoke(request: CreateGameRequest): CreateGameResponse {
-        if (gameRepository.existsByTitle(request.title)) {
-            gameTitleAlreadyExists(request.title)
+    operator fun invoke(command: CreateGameCommand): CreateGameResult {
+        if (gameRepository.existsByTitle(command.title)) {
+            gameTitleAlreadyExists(command.title)
         }
 
-        val game = Game(GameId.random(), request.title)
+        val game = Game(GameId.random(), command.title)
         gameRepository.save(game)
 
         log.info { "game created" }
 
-        return CreateGameResponse(
+        return CreateGameResult(
             gameId = game.id
         )
     }

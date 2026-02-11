@@ -8,6 +8,7 @@ import io.mockk.verify
 import net.lausi95.citygame.domain.game.Game
 import net.lausi95.citygame.domain.game.GameRepository
 import net.lausi95.citygame.domain.game.GameTitle
+import net.lausi95.citygame.domain.game.GameTitleAlreadyExistsException
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.SoftAssertions
 import org.junit.jupiter.api.BeforeEach
@@ -32,7 +33,7 @@ class CreateGameUseCaseTest {
     fun `should create game when conditions meet`() {
         every { gameRepository.existsByTitle(any()) }.answers { false }
         val response = creteGameUseCase(
-            CreateGameRequest(
+            CreateGameCommand(
                 title = GameTitle("Foo")
             )
         )
@@ -47,17 +48,17 @@ class CreateGameUseCaseTest {
     }
 
     @Test
-    fun `shoudl throw IllegalArgumentException, when game with title already exist`() {
+    fun `should throw GameTitleAlreadyExistsException, when game with title already exist`() {
         every { gameRepository.existsByTitle(any()) }.answers { true }
-        val exception = assertThrows<IllegalArgumentException> {
+        val exception = assertThrows<GameTitleAlreadyExistsException> {
             creteGameUseCase(
-                CreateGameRequest(
+                CreateGameCommand(
                     title = GameTitle("Foo")
                 )
             )
         }
 
         verify(exactly = 0) { gameRepository.save(any()) }
-        Assertions.assertThat(exception.message).isEqualTo("Game with title already exist. Title: 'Foo'")
+        Assertions.assertThat(exception.message).isEqualTo("Game title already exist: Foo")
     }
 }

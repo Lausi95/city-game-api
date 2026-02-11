@@ -4,8 +4,8 @@ import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.slot
 import io.mockk.verify
-import net.lausi95.citygame.application.usecase.game.creategame.CreateGameRequest
-import net.lausi95.citygame.application.usecase.game.creategame.CreateGameResponse
+import net.lausi95.citygame.application.usecase.game.creategame.CreateGameCommand
+import net.lausi95.citygame.application.usecase.game.creategame.CreateGameResult
 import net.lausi95.citygame.application.usecase.game.creategame.CreateGameUseCase
 import net.lausi95.citygame.application.usecase.game.getgame.GetGameUseCase
 import net.lausi95.citygame.application.usecase.game.getgames.GetGamesUseCase
@@ -48,10 +48,10 @@ class GameControllerTest {
     inner class PostGame {
         @Test
         fun `should map pass request to use case and responds with 201 and location header with id from use case`() {
-            val createGameResponse = CreateGameResponse(
+            val createGameResult = CreateGameResult(
                 gameId = GameId("some-game-id")
             )
-            every { createGameUseCase(any()) }.answers { createGameResponse }
+            every { createGameUseCase(any()) }.answers { createGameResult }
 
             mockMvc.post("/games") {
                 contentType = MediaType.APPLICATION_JSON
@@ -68,10 +68,10 @@ class GameControllerTest {
                 }
             }
 
-            val createGameRequest = slot<CreateGameRequest>()
-            verify { createGameUseCase(capture(createGameRequest)) }
+            val createGameCommand = slot<CreateGameCommand>()
+            verify { createGameUseCase(capture(createGameCommand)) }
 
-            assertThat(createGameRequest.captured.title).isEqualTo(GameTitle("City-Game Luckenwalde 2026"))
+            assertThat(createGameCommand.captured.title).isEqualTo(GameTitle("City-Game Luckenwalde 2026"))
         }
 
         @Test

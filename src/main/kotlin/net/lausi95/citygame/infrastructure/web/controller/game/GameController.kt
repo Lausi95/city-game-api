@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.validation.Valid
-import net.lausi95.citygame.application.usecase.game.creategame.CreateGameRequest
+import net.lausi95.citygame.application.usecase.game.creategame.CreateGameCommand
 import net.lausi95.citygame.application.usecase.game.creategame.CreateGameUseCase
 import net.lausi95.citygame.application.usecase.game.getgame.GetGameUseCase
 import net.lausi95.citygame.application.usecase.game.getgames.GetGamesUseCase
@@ -48,15 +48,15 @@ class GameController(
     fun postGame(
         @RequestBody @Valid requestDto: CreateGameRequestDto
     ): ResponseEntity<Unit> {
-        val response = createGameUseCase(
-            CreateGameRequest(
-                title = GameTitle(requestDto.title!!)
-            )
+        val command = CreateGameCommand(
+            title = GameTitle(requireNotNull(requestDto.title))
         )
+
+        val result = createGameUseCase(command)
 
         val uri = ServletUriComponentsBuilder.fromCurrentContextPath()
             .path("/games/{gameId}")
-            .build(response.gameId.value)
+            .build(result.gameId.value)
 
         return ResponseEntity.created(uri).build()
     }
