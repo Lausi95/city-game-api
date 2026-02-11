@@ -8,6 +8,7 @@ import net.lausi95.citygame.application.usecase.game.creategame.CreateGameReques
 import net.lausi95.citygame.application.usecase.game.creategame.CreateGameResponse
 import net.lausi95.citygame.application.usecase.game.creategame.CreateGameUseCase
 import net.lausi95.citygame.application.usecase.game.getgame.GetGameUseCase
+import net.lausi95.citygame.application.usecase.game.getgames.GetGamesUseCase
 import net.lausi95.citygame.domain.DomainException
 import net.lausi95.citygame.domain.game.Game
 import net.lausi95.citygame.domain.game.GameId
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
+import org.springframework.data.domain.PageImpl
 import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt
 import org.springframework.test.web.servlet.MockMvc
@@ -37,6 +39,9 @@ class GameControllerTest {
 
     @MockkBean
     private lateinit var getGameUseCase: GetGameUseCase
+
+    @MockkBean
+    private lateinit var gameGamesUseCase: GetGamesUseCase
 
     @Nested
     @DisplayName("POST /games")
@@ -161,6 +166,21 @@ class GameControllerTest {
                 jsonPath("$.id", equalTo("some-game-id"))
                 jsonPath("$.title", equalTo("some game title"))
                 jsonPath("$.links.self", equalTo("/games/some-game-id"))
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /games")
+    inner class GetGames {
+        @Test
+        fun `should respond with first page of games`() {
+            every { gameGamesUseCase(any()) } answers { PageImpl(listOf()) }
+            mockMvc.get("/games") {
+                with(jwt())
+            }.andExpect {
+                status { isOk() }
+                jsonPath("$.id", equalTo(":)"))
             }
         }
     }

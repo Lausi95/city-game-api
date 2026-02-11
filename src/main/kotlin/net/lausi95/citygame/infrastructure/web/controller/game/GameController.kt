@@ -9,8 +9,11 @@ import jakarta.validation.Valid
 import net.lausi95.citygame.application.usecase.game.creategame.CreateGameRequest
 import net.lausi95.citygame.application.usecase.game.creategame.CreateGameUseCase
 import net.lausi95.citygame.application.usecase.game.getgame.GetGameUseCase
+import net.lausi95.citygame.application.usecase.game.getgames.GetGamesUseCase
 import net.lausi95.citygame.domain.game.GameId
 import net.lausi95.citygame.domain.game.GameTitle
+import org.springframework.data.domain.Pageable
+import org.springframework.data.web.PageableDefault
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -21,6 +24,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 class GameController(
     private val createGameUseCase: CreateGameUseCase,
     private val getGameUseCase: GetGameUseCase,
+    private val getGamesUseCase: GetGamesUseCase,
 ) {
 
     @PostMapping
@@ -63,5 +67,11 @@ class GameController(
     ): GameResource {
         val game = getGameUseCase(GameId(gameId))
         return GameResource(game)
+    }
+
+    @GetMapping
+    fun getGames(@PageableDefault pageable: Pageable): GameCollection {
+        val games = getGamesUseCase(pageable)
+        return GameCollection(games)
     }
 }
