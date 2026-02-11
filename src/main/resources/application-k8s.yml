@@ -1,7 +1,7 @@
 logging:
   structured:
     format:
-      console: ecs
+      console: logstash
   level:
     root: warn
     net.lausi95.citygame: info
