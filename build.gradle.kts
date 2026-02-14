@@ -82,6 +82,8 @@ allOpen {
 tasks.withType<Test> {
     useJUnitPlatform()
     finalizedBy(tasks.jacocoTestReport)
+    jvmArgs("-XX:+EnableDynamicAgentLoading")
+    jvmArgs("-Xshare:off")
 }
 
 tasks.jacocoTestReport {

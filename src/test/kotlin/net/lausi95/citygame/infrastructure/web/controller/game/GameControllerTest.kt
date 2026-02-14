@@ -9,6 +9,7 @@ import net.lausi95.citygame.application.usecase.game.creategame.CreateGameResult
 import net.lausi95.citygame.application.usecase.game.creategame.CreateGameUseCase
 import net.lausi95.citygame.application.usecase.game.getgame.GetGameUseCase
 import net.lausi95.citygame.application.usecase.game.getgames.GetGamesUseCase
+import net.lausi95.citygame.bdd.randomGame
 import net.lausi95.citygame.domain.DomainException
 import net.lausi95.citygame.domain.game.Game
 import net.lausi95.citygame.domain.game.GameId
@@ -175,12 +176,17 @@ class GameControllerTest {
     inner class GetGames {
         @Test
         fun `should respond with first page of games`() {
-            every { gameGamesUseCase(any()) } answers { PageImpl(listOf()) }
+            val games = (1..10).map { randomGame() }
+            every { gameGamesUseCase(any()) } answers { PageImpl(games) }
             mockMvc.get("/games") {
                 with(jwt())
             }.andExpect {
                 status { isOk() }
-                jsonPath("$.id", equalTo(":)"))
+                jsonPath("$.content.length()", equalTo(10))
+                jsonPath("$.size", equalTo(10))
+                jsonPath("$.number", equalTo(0))
+                jsonPath("$.totalPages", equalTo(1))
+                jsonPath("$.links.self", equalTo("/games"))
             }
         }
     }
