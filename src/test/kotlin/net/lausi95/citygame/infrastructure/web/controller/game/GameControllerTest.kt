@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt
 import org.springframework.test.web.servlet.MockMvc
@@ -42,7 +43,7 @@ class GameControllerTest {
     private lateinit var getGameUseCase: GetGameUseCase
 
     @MockkBean
-    private lateinit var gameGamesUseCase: GetGamesUseCase
+    private lateinit var getGamesUseCase: GetGamesUseCase
 
     @Nested
     @DisplayName("POST /games")
@@ -176,11 +177,15 @@ class GameControllerTest {
     inner class GetGames {
         @Test
         fun `should respond with first page of games`() {
+            // arrange
             val games = (1..10).map { randomGame() }
-            every { gameGamesUseCase(any()) } answers { PageImpl(games) }
+            every { getGamesUseCase(any()) } answers { PageImpl(games) }
+
+            // act
             mockMvc.get("/games") {
                 with(jwt())
             }.andExpect {
+                // assert
                 status { isOk() }
                 jsonPath("$.content.length()", equalTo(10))
                 jsonPath("$.size", equalTo(10))
@@ -188,6 +193,60 @@ class GameControllerTest {
                 jsonPath("$.totalPages", equalTo(1))
                 jsonPath("$.links.self", equalTo("/games"))
             }
+        }
+
+        @Test
+        fun `should pass default params to pagable`() {
+            // arrange
+            every { getGamesUseCase(any()) } answers { PageImpl(emptyList()) }
+
+            // act
+            mockMvc.get("/games") {
+                with(jwt())
+            }.andExpect { status { isOk() } }
+
+            // assert
+            val pageable = slot<Pageable>()
+            verify { getGamesUseCase(capture(pageable)) }
+
+            assertThat(pageable.captured.pageSize).isEqualTo(10)
+            assertThat(pageable.captured.pageNumber).isEqualTo(0)
+        }
+
+        @Test
+        fun `should pass page size to pageable`() {
+            // arrange
+            every { getGamesUseCase(any()) } answers { PageImpl(emptyList()) }
+
+            // act
+            mockMvc.get("/games") {
+                param("size", "20")
+                with(jwt())
+            }.andExpect { status { isOk() } }
+
+            // assert
+            val pageable = slot<Pageable>()
+            verify { getGamesUseCase(capture(pageable)) }
+
+            assertThat(pageable.captured.pageSize).isEqualTo(20)
+        }
+
+        @Test
+        fun `should pass page number to pageable`() {
+            // arrange
+            every { getGamesUseCase(any()) } answers { PageImpl(emptyList()) }
+
+            // act
+            mockMvc.get("/games") {
+                param("page", "3")
+                with(jwt())
+            }.andExpect { status { isOk() } }
+
+            // assert
+            val pageable = slot<Pageable>()
+            verify { getGamesUseCase(capture(pageable)) }
+
+            assertThat(pageable.captured.pageNumber).isEqualTo(3)
         }
     }
 }
