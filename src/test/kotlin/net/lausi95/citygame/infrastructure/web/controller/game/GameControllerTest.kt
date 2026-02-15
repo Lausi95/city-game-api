@@ -54,7 +54,7 @@ class GameControllerTest {
             val createGameResult = CreateGameResult(
                 gameId = GameId("some-game-id")
             )
-            every { createGameUseCase(any()) }.answers { createGameResult }
+            every { createGameUseCase(any(), any()) }.answers { createGameResult }
 
             mockMvc.post("/games") {
                 contentType = MediaType.APPLICATION_JSON
@@ -72,7 +72,7 @@ class GameControllerTest {
             }
 
             val createGameCommand = slot<CreateGameCommand>()
-            verify { createGameUseCase(capture(createGameCommand)) }
+            verify { createGameUseCase(capture(createGameCommand), any()) }
 
             assertThat(createGameCommand.captured.title).isEqualTo(GameTitle("City-Game Luckenwalde 2026"))
         }
@@ -127,7 +127,7 @@ class GameControllerTest {
 
         @Test
         fun `should respond with bad request, when use case throws an illegal argument exception`() {
-            every { createGameUseCase(any()) }.throws(DomainException("Something went wrong"))
+            every { createGameUseCase(any(), any()) }.throws(DomainException("Something went wrong"))
             mockMvc.post("/games") {
                 contentType = MediaType.APPLICATION_JSON
                 with(jwt())
@@ -213,7 +213,7 @@ class GameControllerTest {
 
             assertThat(pageable.captured.pageSize).isEqualTo(10)
             assertThat(pageable.captured.pageNumber).isEqualTo(0)
-            assertThat(tenant.captured).isEqualTo(Tenant.DEFAULT)
+            assertThat(tenant.captured).isEqualTo(Tenant("localhost"))
         }
 
         @Test

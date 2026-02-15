@@ -2,6 +2,13 @@ package net.lausi95.citygame.domain
 
 data class Tenant(val value: String) {
     companion object {
-        val DEFAULT = Tenant("default")
+        fun parse(host: String): Tenant {
+            var x = 0
+            while (x < host.length && host[x] != '.') {
+                x++
+            }
+            val tenant = host.substring(0, x)
+            return Tenant(tenant)
+        }
     }
 }

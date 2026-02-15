@@ -52,10 +52,9 @@ class GameController(
     ): ResponseEntity<Unit> {
         val command = CreateGameCommand(
             title = GameTitle(requireNotNull(requestDto.title)),
-            tenant = tenant
         )
 
-        val result = createGameUseCase(command)
+        val result = createGameUseCase(command, tenant)
 
         val uri = ServletUriComponentsBuilder.fromCurrentContextPath()
             .path("/games/{gameId}")

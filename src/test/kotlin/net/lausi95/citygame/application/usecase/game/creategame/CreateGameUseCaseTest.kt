@@ -34,34 +34,26 @@ class CreateGameUseCaseTest {
     @Test
     fun `should create game when conditions meet`() {
         val tenant = Tenant.random()
+        val gameTitle = GameTitle.random()
         every { gameRepository.existsByTitle(any(), tenant) }.answers { false }
-        val response = creteGameUseCase(
-            CreateGameCommand(
-                title = GameTitle("Foo"),
-                tenant = tenant
-            )
-        )
+        val response = creteGameUseCase(CreateGameCommand(gameTitle), tenant)
 
         val game = slot<Game>()
         verify { gameRepository.save(capture(game), tenant) }
 
         SoftAssertions.assertSoftly {
             it.assertThat(game.captured.id).isEqualTo(response.gameId)
-            it.assertThat(game.captured.title).isEqualTo(GameTitle("Foo"))
+            it.assertThat(game.captured.title).isEqualTo(gameTitle)
         }
     }
 
     @Test
     fun `should throw GameTitleAlreadyExistsException, when game with title already exist`() {
         val tenant = Tenant.random()
+        val gameTitle = GameTitle.random()
         every { gameRepository.existsByTitle(any(), tenant) }.answers { true }
         val exception = assertThrows<GameTitleAlreadyExistsException> {
-            creteGameUseCase(
-                CreateGameCommand(
-                    title = GameTitle("Foo"),
-                    tenant = tenant
-                )
-            )
+            creteGameUseCase(CreateGameCommand(gameTitle), tenant)
         }
 
         verify(exactly = 0) { gameRepository.save(any(), tenant) }

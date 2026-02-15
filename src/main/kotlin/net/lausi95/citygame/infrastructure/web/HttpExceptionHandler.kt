@@ -52,3 +52,10 @@ class HttpExceptionHandler {
         return ProblemDetail.forStatus(500)
     }
 }
+
+/*
+tenant.misterx.com
+tenant.api.misterx.com
+tenant.agent.misterx.com
+tenant.admin.misterx.com
+*/
