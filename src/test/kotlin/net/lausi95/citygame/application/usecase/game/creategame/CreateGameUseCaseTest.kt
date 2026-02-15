@@ -11,8 +11,8 @@ import net.lausi95.citygame.domain.game.Game
 import net.lausi95.citygame.domain.game.GameRepository
 import net.lausi95.citygame.domain.game.GameTitle
 import net.lausi95.citygame.domain.game.GameTitleAlreadyExistsException
-import org.assertj.core.api.Assertions
-import org.assertj.core.api.SoftAssertions
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.SoftAssertions.assertSoftly
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -23,12 +23,11 @@ class CreateGameUseCaseTest {
 
     @MockK(relaxed = true)
     private lateinit var gameRepository: GameRepository
-
-    private lateinit var creteGameUseCase: CreateGameUseCase
+    private lateinit var createGameUseCase: CreateGameUseCase
 
     @BeforeEach
     fun setUp() {
-        creteGameUseCase = CreateGameUseCase(gameRepository)
+        createGameUseCase = CreateGameUseCase(gameRepository)
     }
 
     @Test
@@ -36,12 +35,12 @@ class CreateGameUseCaseTest {
         val tenant = Tenant.random()
         val gameTitle = GameTitle.random()
         every { gameRepository.existsByTitle(any(), tenant) }.answers { false }
-        val response = creteGameUseCase(CreateGameCommand(gameTitle), tenant)
+        val response = createGameUseCase(CreateGameCommand(gameTitle), tenant)
 
         val game = slot<Game>()
         verify { gameRepository.save(capture(game), tenant) }
 
-        SoftAssertions.assertSoftly {
+        assertSoftly {
             it.assertThat(game.captured.id).isEqualTo(response.gameId)
             it.assertThat(game.captured.title).isEqualTo(gameTitle)
         }
@@ -53,10 +52,10 @@ class CreateGameUseCaseTest {
         val gameTitle = GameTitle.random()
         every { gameRepository.existsByTitle(any(), tenant) }.answers { true }
         val exception = assertThrows<GameTitleAlreadyExistsException> {
-            creteGameUseCase(CreateGameCommand(gameTitle), tenant)
+            createGameUseCase(CreateGameCommand(gameTitle), tenant)
         }
 
         verify(exactly = 0) { gameRepository.save(any(), tenant) }
-        Assertions.assertThat(exception.message).isEqualTo("Game title already exist: Foo")
+        assertThat(exception.message).isEqualTo("Game title already exist: ${gameTitle.value}")
     }
 }

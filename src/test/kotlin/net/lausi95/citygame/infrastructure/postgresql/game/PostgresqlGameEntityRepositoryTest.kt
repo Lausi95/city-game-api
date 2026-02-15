@@ -45,6 +45,16 @@ class PostgresqlGameEntityRepositoryTest {
     }
 
     @Test
+    fun `should return null when entity game with id does not exist`() {
+        val someTenant = Tenant.random()
+        val someGameId = GameId.random()
+
+        val gameFromDb = gameRepository.findById(someGameId, someTenant)
+
+        assertThat(gameFromDb).isNull()
+    }
+
+    @Test
     fun `on existsByTitle(), should return true, when game with that title was saved before`() {
         val tenant = Tenant.random()
         val someTitle = GameTitle("some title")
@@ -53,6 +63,18 @@ class PostgresqlGameEntityRepositoryTest {
         val existsByTitle = gameRepository.existsByTitle(someTitle, tenant)
 
         assertThat(existsByTitle).isTrue()
+    }
+
+    @Test
+    fun `on existsByTitle(), should return false, when asking with a different tenant`() {
+        val tenant = Tenant.random()
+        val otherTenant = Tenant.random()
+        val someTitle = GameTitle("some title")
+        gameRepository.save(Game(GameId.random(), someTitle), tenant)
+
+        val existsByTitle = gameRepository.existsByTitle(someTitle, otherTenant)
+
+        assertThat(existsByTitle).isFalse()
     }
 
     @Test

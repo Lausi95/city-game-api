@@ -25,7 +25,7 @@ class CreateGameUseCase(
         val game = Game(GameId.random(), command.title)
         gameRepository.save(game, tenant)
 
-        log.info { "game created" }
+        log.info { "Game created" }
 
         return CreateGameResult(
             gameId = game.id
