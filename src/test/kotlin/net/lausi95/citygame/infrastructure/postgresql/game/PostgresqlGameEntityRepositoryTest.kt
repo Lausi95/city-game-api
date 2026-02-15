@@ -1,6 +1,8 @@
 package net.lausi95.citygame.infrastructure.postgresql.game
 
 import net.lausi95.citygame.TestcontainersConfiguration
+import net.lausi95.citygame.bdd.random
+import net.lausi95.citygame.domain.Tenant
 import net.lausi95.citygame.domain.game.Game
 import net.lausi95.citygame.domain.game.GameId
 import net.lausi95.citygame.domain.game.GameRepository
@@ -28,11 +30,12 @@ class PostgresqlGameEntityRepositoryTest {
     }
 
     @Test
-    fun `should save and load enitity`() {
+    fun `should save and load entity`() {
+        val tenant = Tenant.random()
         val game = Game(GameId.random(), GameTitle(":)"))
-        gameRepository.save(game)
+        gameRepository.save(game, tenant)
 
-        val gameFromDb = gameRepository.findById(game.id)
+        val gameFromDb = gameRepository.findById(game.id, tenant)
 
         assertThat(gameFromDb).isNotNull()
         assertSoftly {
@@ -43,19 +46,21 @@ class PostgresqlGameEntityRepositoryTest {
 
     @Test
     fun `on existsByTitle(), should return true, when game with that title was saved before`() {
+        val tenant = Tenant.random()
         val someTitle = GameTitle("some title")
-        gameRepository.save(Game(GameId.random(), someTitle))
+        gameRepository.save(Game(GameId.random(), someTitle), tenant)
 
-        val existsByTitle = gameRepository.existsByTitle(someTitle)
+        val existsByTitle = gameRepository.existsByTitle(someTitle, tenant)
 
         assertThat(existsByTitle).isTrue()
     }
 
     @Test
     fun `on existsByTitle(), should return false, when game with that title was never saved`() {
+        val tenant = Tenant.random()
         val someTitle = GameTitle("some title")
 
-        val existsByTitle = gameRepository.existsByTitle(someTitle)
+        val existsByTitle = gameRepository.existsByTitle(someTitle, tenant)
 
         assertThat(existsByTitle).isFalse()
     }

@@ -17,12 +17,12 @@ class CreateGameUseCase(
 
     @Transactional
     operator fun invoke(command: CreateGameCommand): CreateGameResult {
-        if (gameRepository.existsByTitle(command.title)) {
+        if (gameRepository.existsByTitle(command.title, command.tenant)) {
             gameTitleAlreadyExists(command.title)
         }
 
         val game = Game(GameId.random(), command.title)
-        gameRepository.save(game)
+        gameRepository.save(game, command.tenant)
 
         log.info { "game created" }
 

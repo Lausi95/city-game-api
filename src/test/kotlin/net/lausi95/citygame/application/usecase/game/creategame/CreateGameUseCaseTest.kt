@@ -5,6 +5,8 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.slot
 import io.mockk.verify
+import net.lausi95.citygame.bdd.random
+import net.lausi95.citygame.domain.Tenant
 import net.lausi95.citygame.domain.game.Game
 import net.lausi95.citygame.domain.game.GameRepository
 import net.lausi95.citygame.domain.game.GameTitle
@@ -31,15 +33,17 @@ class CreateGameUseCaseTest {
 
     @Test
     fun `should create game when conditions meet`() {
-        every { gameRepository.existsByTitle(any()) }.answers { false }
+        val tenant = Tenant.random()
+        every { gameRepository.existsByTitle(any(), tenant) }.answers { false }
         val response = creteGameUseCase(
             CreateGameCommand(
-                title = GameTitle("Foo")
+                title = GameTitle("Foo"),
+                tenant = tenant
             )
         )
 
         val game = slot<Game>()
-        verify { gameRepository.save(capture(game)) }
+        verify { gameRepository.save(capture(game), tenant) }
 
         SoftAssertions.assertSoftly {
             it.assertThat(game.captured.id).isEqualTo(response.gameId)
@@ -49,16 +53,18 @@ class CreateGameUseCaseTest {
 
     @Test
     fun `should throw GameTitleAlreadyExistsException, when game with title already exist`() {
-        every { gameRepository.existsByTitle(any()) }.answers { true }
+        val tenant = Tenant.random()
+        every { gameRepository.existsByTitle(any(), tenant) }.answers { true }
         val exception = assertThrows<GameTitleAlreadyExistsException> {
             creteGameUseCase(
                 CreateGameCommand(
-                    title = GameTitle("Foo")
+                    title = GameTitle("Foo"),
+                    tenant = tenant
                 )
             )
         }
 
-        verify(exactly = 0) { gameRepository.save(any()) }
+        verify(exactly = 0) { gameRepository.save(any(), tenant) }
         Assertions.assertThat(exception.message).isEqualTo("Game title already exist: Foo")
     }
 }

@@ -5,6 +5,8 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
+import net.lausi95.citygame.bdd.random
+import net.lausi95.citygame.domain.Tenant
 import net.lausi95.citygame.domain.game.Game
 import net.lausi95.citygame.domain.game.GameRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -28,13 +30,14 @@ class GetGamesUseCaseTest {
 
     @Test
     fun `should pass down request to game repository and replies with its reply`() {
+        val someTenant = Tenant.random()
         val pageable = mockk<Pageable>()
         val page = mockk<Page<Game>>()
-        every { gameRepository.find(pageable) } returns page
+        every { gameRepository.find(pageable, someTenant) } returns page
 
-        val result = getGamesUseCase(pageable)
+        val result = getGamesUseCase(pageable, someTenant)
 
-        verify { gameRepository.find(pageable) }
+        verify { gameRepository.find(pageable, someTenant) }
         assertThat(result).isEqualTo(page)
     }
 }

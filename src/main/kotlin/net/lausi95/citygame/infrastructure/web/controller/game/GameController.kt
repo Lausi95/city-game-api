@@ -10,6 +10,7 @@ import net.lausi95.citygame.application.usecase.game.creategame.CreateGameComman
 import net.lausi95.citygame.application.usecase.game.creategame.CreateGameUseCase
 import net.lausi95.citygame.application.usecase.game.getgame.GetGameUseCase
 import net.lausi95.citygame.application.usecase.game.getgames.GetGamesUseCase
+import net.lausi95.citygame.domain.Tenant
 import net.lausi95.citygame.domain.game.GameId
 import net.lausi95.citygame.domain.game.GameTitle
 import org.springframework.data.domain.Pageable
@@ -46,10 +47,12 @@ class GameController(
         content = [Content(mediaType = "application/json", schema = Schema(ProblemDetail::class))],
     )
     fun postGame(
-        @RequestBody @Valid requestDto: CreateGameRequestDto
+        @RequestBody @Valid requestDto: CreateGameRequestDto,
+        @RequestAttribute tenant: Tenant
     ): ResponseEntity<Unit> {
         val command = CreateGameCommand(
-            title = GameTitle(requireNotNull(requestDto.title))
+            title = GameTitle(requireNotNull(requestDto.title)),
+            tenant = tenant
         )
 
         val result = createGameUseCase(command)
@@ -63,15 +66,19 @@ class GameController(
 
     @GetMapping("/{gameId}")
     fun getGame(
-        @PathVariable gameId: String
+        @PathVariable gameId: String,
+        @RequestAttribute tenant: Tenant
     ): GameResource {
-        val game = getGameUseCase(GameId(gameId))
+        val game = getGameUseCase(GameId(gameId), tenant)
         return GameResource(game)
     }
 
     @GetMapping
-    fun getGames(@PageableDefault pageable: Pageable): GameCollection {
-        val games = getGamesUseCase(pageable)
+    fun getGames(
+        @PageableDefault pageable: Pageable,
+        @RequestAttribute tenant: Tenant
+    ): GameCollection {
+        val games = getGamesUseCase(pageable, tenant)
         return GameCollection(games)
     }
 }

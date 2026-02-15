@@ -11,6 +11,7 @@ import net.lausi95.citygame.application.usecase.game.getgame.GetGameUseCase
 import net.lausi95.citygame.application.usecase.game.getgames.GetGamesUseCase
 import net.lausi95.citygame.bdd.randomGame
 import net.lausi95.citygame.domain.DomainException
+import net.lausi95.citygame.domain.Tenant
 import net.lausi95.citygame.domain.game.Game
 import net.lausi95.citygame.domain.game.GameId
 import net.lausi95.citygame.domain.game.GameNotFoundException
@@ -148,7 +149,7 @@ class GameControllerTest {
         @Test
         fun `should response with not found, when game with given id does not exist`() {
             val gameId = GameId.random()
-            every { getGameUseCase(gameId) }.throws(GameNotFoundException("Game not found"))
+            every { getGameUseCase(gameId, any()) }.throws(GameNotFoundException("Game not found"))
             mockMvc.get("/games/{gameId}", gameId.value) {
                 with(jwt())
             }.andExpect {
@@ -160,7 +161,7 @@ class GameControllerTest {
         @Test
         fun `should response with game resource, when the requested game does exist`() {
             val game = Game(GameId("some-game-id"), GameTitle("some game title"))
-            every { getGameUseCase(game.id) }.answers { game }
+            every { getGameUseCase(game.id, any()) }.answers { game }
             mockMvc.get("/games/{gameId}", game.id) {
                 with(jwt())
             }.andExpect {
@@ -179,7 +180,7 @@ class GameControllerTest {
         fun `should respond with first page of games`() {
             // arrange
             val games = (1..10).map { randomGame() }
-            every { getGamesUseCase(any()) } answers { PageImpl(games) }
+            every { getGamesUseCase(any(), any()) } answers { PageImpl(games) }
 
             // act
             mockMvc.get("/games") {
@@ -198,7 +199,7 @@ class GameControllerTest {
         @Test
         fun `should pass default params to pagable`() {
             // arrange
-            every { getGamesUseCase(any()) } answers { PageImpl(emptyList()) }
+            every { getGamesUseCase(any(), any()) } answers { PageImpl(emptyList()) }
 
             // act
             mockMvc.get("/games") {
@@ -207,16 +208,18 @@ class GameControllerTest {
 
             // assert
             val pageable = slot<Pageable>()
-            verify { getGamesUseCase(capture(pageable)) }
+            val tenant = slot<Tenant>()
+            verify { getGamesUseCase(capture(pageable), capture(tenant)) }
 
             assertThat(pageable.captured.pageSize).isEqualTo(10)
             assertThat(pageable.captured.pageNumber).isEqualTo(0)
+            assertThat(tenant.captured).isEqualTo(Tenant.DEFAULT)
         }
 
         @Test
         fun `should pass page size to pageable`() {
             // arrange
-            every { getGamesUseCase(any()) } answers { PageImpl(emptyList()) }
+            every { getGamesUseCase(any(), any()) } answers { PageImpl(emptyList()) }
 
             // act
             mockMvc.get("/games") {
@@ -226,7 +229,7 @@ class GameControllerTest {
 
             // assert
             val pageable = slot<Pageable>()
-            verify { getGamesUseCase(capture(pageable)) }
+            verify { getGamesUseCase(capture(pageable), any()) }
 
             assertThat(pageable.captured.pageSize).isEqualTo(20)
         }
@@ -234,7 +237,7 @@ class GameControllerTest {
         @Test
         fun `should pass page number to pageable`() {
             // arrange
-            every { getGamesUseCase(any()) } answers { PageImpl(emptyList()) }
+            every { getGamesUseCase(any(), any()) } answers { PageImpl(emptyList()) }
 
             // act
             mockMvc.get("/games") {
@@ -244,7 +247,7 @@ class GameControllerTest {
 
             // assert
             val pageable = slot<Pageable>()
-            verify { getGamesUseCase(capture(pageable)) }
+            verify { getGamesUseCase(capture(pageable), any()) }
 
             assertThat(pageable.captured.pageNumber).isEqualTo(3)
         }
