@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.context.annotation.Import
+import org.springframework.data.domain.Pageable
 
 @DataJpaTest
 @Import(TestcontainersConfiguration::class)
@@ -85,5 +86,26 @@ class PostgresqlGameEntityRepositoryTest {
         val existsByTitle = gameRepository.existsByTitle(someTitle, tenant)
 
         assertThat(existsByTitle).isFalse()
+    }
+
+    @Test
+    fun `should load games according to pageable`() {
+        // arrange
+        val tenant = Tenant.random()
+        repeat(10) {
+            val gameId = GameId.random()
+            val gameTitle = GameTitle.random()
+            gameRepository.save(Game(gameId, gameTitle), tenant)
+        }
+        val pageable1 = Pageable.ofSize(6).withPage(0)
+        val pageable2 = Pageable.ofSize(6).withPage(1)
+
+        // act
+        val page1 = gameRepository.find(pageable1, tenant)
+        val page2 = gameRepository.find(pageable2, tenant)
+
+        // assert
+        assertThat(page1.numberOfElements).isEqualTo(6)
+        assertThat(page2.numberOfElements).isEqualTo(4)
     }
 }

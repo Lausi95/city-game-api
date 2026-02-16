@@ -28,6 +28,6 @@ class PostgresqlGameRepository(
     }
 
     override fun find(pageable: Pageable, tenant: Tenant): Page<Game> {
-        TODO("Not yet implemented")
+        return postgresqlGameEntityRepository.findAllByTenant(pageable, tenant.value).map { it.toGame() }
     }
 }
