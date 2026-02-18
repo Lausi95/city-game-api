@@ -55,6 +55,7 @@ dependencies {
     testImplementation("com.ninja-squad:springmockk:${property("springmockkVersion")}")
 
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-actuator-test")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
     testImplementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server-test")
@@ -62,6 +63,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")
     testImplementation("org.testcontainers:testcontainers-postgresql")
+    testImplementation("com.github.dasniko:testcontainers-keycloak:4.1.1")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("io.nayuki:qrcodegen:${property("qrcodegenVersion")}")

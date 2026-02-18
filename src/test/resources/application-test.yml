@@ -1,0 +1,12 @@
+keycloak:
+  client_id: test-client
+  username: test@example.com
+  password: Pass123!
+
+logging:
+  structured:
+    format:
+      console: logstash
+  level:
+    root: info
+    net.lausi95.citygame: debug
