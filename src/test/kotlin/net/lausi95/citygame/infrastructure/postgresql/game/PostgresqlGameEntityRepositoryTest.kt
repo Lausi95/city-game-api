@@ -1,6 +1,8 @@
 package net.lausi95.citygame.infrastructure.postgresql.game
 
 import net.lausi95.citygame.TestcontainersConfiguration
+import net.lausi95.citygame.bdd.random
+import net.lausi95.citygame.domain.Tenant
 import net.lausi95.citygame.domain.game.Game
 import net.lausi95.citygame.domain.game.GameId
 import net.lausi95.citygame.domain.game.GameRepository
@@ -12,6 +14,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.context.annotation.Import
+import org.springframework.data.domain.Pageable
 
 @DataJpaTest
 @Import(TestcontainersConfiguration::class)
@@ -28,11 +31,12 @@ class PostgresqlGameEntityRepositoryTest {
     }
 
     @Test
-    fun `should save and load enitity`() {
+    fun `should save and load entity`() {
+        val tenant = Tenant.random()
         val game = Game(GameId.random(), GameTitle(":)"))
-        gameRepository.save(game)
+        gameRepository.save(game, tenant)
 
-        val gameFromDb = gameRepository.findById(game.id)
+        val gameFromDb = gameRepository.findById(game.id, tenant)
 
         assertThat(gameFromDb).isNotNull()
         assertSoftly {
@@ -42,21 +46,66 @@ class PostgresqlGameEntityRepositoryTest {
     }
 
     @Test
-    fun `on existsByTitle(), should return true, when game with that title was saved before`() {
-        val someTitle = GameTitle("some title")
-        gameRepository.save(Game(GameId.random(), someTitle))
+    fun `should return null when entity game with id does not exist`() {
+        val someTenant = Tenant.random()
+        val someGameId = GameId.random()
 
-        val existsByTitle = gameRepository.existsByTitle(someTitle)
+        val gameFromDb = gameRepository.findById(someGameId, someTenant)
+
+        assertThat(gameFromDb).isNull()
+    }
+
+    @Test
+    fun `on existsByTitle(), should return true, when game with that title was saved before`() {
+        val tenant = Tenant.random()
+        val someTitle = GameTitle("some title")
+        gameRepository.save(Game(GameId.random(), someTitle), tenant)
+
+        val existsByTitle = gameRepository.existsByTitle(someTitle, tenant)
 
         assertThat(existsByTitle).isTrue()
     }
 
     @Test
-    fun `on existsByTitle(), should return false, when game with that title was never saved`() {
+    fun `on existsByTitle(), should return false, when asking with a different tenant`() {
+        val tenant = Tenant.random()
+        val otherTenant = Tenant.random()
         val someTitle = GameTitle("some title")
+        gameRepository.save(Game(GameId.random(), someTitle), tenant)
 
-        val existsByTitle = gameRepository.existsByTitle(someTitle)
+        val existsByTitle = gameRepository.existsByTitle(someTitle, otherTenant)
 
         assertThat(existsByTitle).isFalse()
+    }
+
+    @Test
+    fun `on existsByTitle(), should return false, when game with that title was never saved`() {
+        val tenant = Tenant.random()
+        val someTitle = GameTitle("some title")
+
+        val existsByTitle = gameRepository.existsByTitle(someTitle, tenant)
+
+        assertThat(existsByTitle).isFalse()
+    }
+
+    @Test
+    fun `should load games according to pageable`() {
+        // arrange
+        val tenant = Tenant.random()
+        repeat(10) {
+            val gameId = GameId.random()
+            val gameTitle = GameTitle.random()
+            gameRepository.save(Game(gameId, gameTitle), tenant)
+        }
+        val pageable1 = Pageable.ofSize(6).withPage(0)
+        val pageable2 = Pageable.ofSize(6).withPage(1)
+
+        // act
+        val page1 = gameRepository.find(pageable1, tenant)
+        val page2 = gameRepository.find(pageable2, tenant)
+
+        // assert
+        assertThat(page1.numberOfElements).isEqualTo(6)
+        assertThat(page2.numberOfElements).isEqualTo(4)
     }
 }

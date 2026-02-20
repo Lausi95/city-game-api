@@ -1,6 +1,7 @@
 package net.lausi95.citygame.application.usecase.game.creategame
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import net.lausi95.citygame.domain.Tenant
 import net.lausi95.citygame.domain.game.Game
 import net.lausi95.citygame.domain.game.GameId
 import net.lausi95.citygame.domain.game.GameRepository
@@ -16,17 +17,17 @@ class CreateGameUseCase(
 ) {
 
     @Transactional
-    operator fun invoke(request: CreateGameRequest): CreateGameResponse {
-        if (gameRepository.existsByTitle(request.title)) {
-            gameTitleAlreadyExists(request.title)
+    operator fun invoke(command: CreateGameCommand, tenant: Tenant): CreateGameResult {
+        if (gameRepository.existsByTitle(command.title, tenant)) {
+            gameTitleAlreadyExists(command.title)
         }
 
-        val game = Game(GameId.random(), request.title)
-        gameRepository.save(game)
+        val game = Game(GameId.random(), command.title)
+        gameRepository.save(game, tenant)
 
-        log.info { "game created" }
+        log.info { "Game created" }
 
-        return CreateGameResponse(
+        return CreateGameResult(
             gameId = game.id
         )
     }

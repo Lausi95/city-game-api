@@ -14,10 +14,14 @@ spring:
     compose:
       lifecycle-management: start_only
 
+tenant:
+  override:
+    enabled: false
+
 logging:
   level:
     root: warn
-    net.lausi95.citygame: debug
+    net.lausi95.citygame: info
   include-application-group: false
   include-application-name: false
 

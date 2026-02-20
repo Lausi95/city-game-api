@@ -3,6 +3,8 @@ package net.lausi95.citygame.application.usecase.game.getgame
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
+import net.lausi95.citygame.bdd.random
+import net.lausi95.citygame.domain.Tenant
 import net.lausi95.citygame.domain.game.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -24,22 +26,25 @@ class GetGameUseCaseTest {
 
     @Test
     fun `should return game when game with given id exists`() {
+        val tenant = Tenant.random()
         val game = Game(GameId("some-game-id"), GameTitle("some-game-title"))
-        every { gameRepository.findById(GameId("some-game-id")) }.answers { game }
+        every { gameRepository.findById(GameId("some-game-id"), tenant) }.answers { game }
 
-        val result = getGameUseCase(GameId("some-game-id"))
+        val result = getGameUseCase(GameId("some-game-id"), tenant)
 
         assertThat(result).isEqualTo(game)
     }
 
     @Test
     fun `should throw GameNotFoundException, when game with given id does not exist`() {
-        every { gameRepository.findById(GameId("some-game-id")) }.answers { null }
+        val someTenant = Tenant.random()
+        val someGameId = GameId.random()
+        every { gameRepository.findById(someGameId, someTenant) }.answers { null }
 
         val exception = assertThrows<GameNotFoundException> {
-            getGameUseCase(GameId("some-game-id"))
+            getGameUseCase(someGameId, someTenant)
         }
 
-        assertThat(exception.message).isEqualTo("Game not found: some-game-id")
+        assertThat(exception.message).isEqualTo("Game not found: ${someGameId.value}")
     }
 }

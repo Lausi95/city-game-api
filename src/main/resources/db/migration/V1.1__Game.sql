@@ -1,4 +1,6 @@
-CREATE TABLE game(
-    id VARCHAR(255) PRIMARY KEY,
-    title VARCHAR(255) NOT NULL
+CREATE TABLE game
+(
+    id     VARCHAR(255) PRIMARY KEY,
+    tenant VARCHAR(255) NOT NULL,
+    title  VARCHAR(255) NOT NULL
 )

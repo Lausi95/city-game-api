@@ -1,0 +1,33 @@
+{
+  "realm": "test-realm",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "test-client",
+      "publicClient": true,
+      "directAccessGrantsEnabled": true
+    }
+  ],
+  "users": [
+    {
+      "username": "test@example.com",
+      "email": "test@example.com",
+      "firstName": "Test",
+      "lastName": "User",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Pass123!"
+        }
+      ],
+      "enabled": true,
+      "emailVerified": true,
+      "requiredActions": [],
+      "clientRoles": {
+        "account": [
+          "view-profile"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+keycloak:
+  client_id: test-client
+  username: test@example.com
+  password: Pass123!
+
+logging:
+  structured:
+    format:
+      console:
+  level:
+    root: info
+    net.lausi95.citygame: debug
+
+tenant:
+  override:
+    enabled: true

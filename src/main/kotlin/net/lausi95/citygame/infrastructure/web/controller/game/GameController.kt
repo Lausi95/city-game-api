@@ -6,11 +6,15 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.validation.Valid
-import net.lausi95.citygame.application.usecase.game.creategame.CreateGameRequest
+import net.lausi95.citygame.application.usecase.game.creategame.CreateGameCommand
 import net.lausi95.citygame.application.usecase.game.creategame.CreateGameUseCase
 import net.lausi95.citygame.application.usecase.game.getgame.GetGameUseCase
+import net.lausi95.citygame.application.usecase.game.getgames.GetGamesUseCase
+import net.lausi95.citygame.domain.Tenant
 import net.lausi95.citygame.domain.game.GameId
 import net.lausi95.citygame.domain.game.GameTitle
+import org.springframework.data.domain.Pageable
+import org.springframework.data.web.PageableDefault
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -21,6 +25,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 class GameController(
     private val createGameUseCase: CreateGameUseCase,
     private val getGameUseCase: GetGameUseCase,
+    private val getGamesUseCase: GetGamesUseCase,
 ) {
 
     @PostMapping
@@ -42,26 +47,37 @@ class GameController(
         content = [Content(mediaType = "application/json", schema = Schema(ProblemDetail::class))],
     )
     fun postGame(
-        @RequestBody @Valid requestDto: CreateGameRequestDto
+        @RequestBody @Valid requestDto: CreateGameRequestDto,
+        @RequestAttribute tenant: Tenant
     ): ResponseEntity<Unit> {
-        val response = createGameUseCase(
-            CreateGameRequest(
-                title = GameTitle(requestDto.title!!)
-            )
+        val command = CreateGameCommand(
+            title = GameTitle(requireNotNull(requestDto.title)),
         )
+
+        val result = createGameUseCase(command, tenant)
 
         val uri = ServletUriComponentsBuilder.fromCurrentContextPath()
             .path("/games/{gameId}")
-            .build(response.gameId.value)
+            .build(result.gameId.value)
 
         return ResponseEntity.created(uri).build()
     }
 
     @GetMapping("/{gameId}")
     fun getGame(
-        @PathVariable gameId: String
+        @PathVariable gameId: String,
+        @RequestAttribute tenant: Tenant
     ): GameResource {
-        val game = getGameUseCase(GameId(gameId))
+        val game = getGameUseCase(GameId(gameId), tenant)
         return GameResource(game)
+    }
+
+    @GetMapping
+    fun getGames(
+        @PageableDefault pageable: Pageable,
+        @RequestAttribute tenant: Tenant
+    ): GameCollection {
+        val games = getGamesUseCase(pageable, tenant)
+        return GameCollection(games)
     }
 }
