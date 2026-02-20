@@ -6,7 +6,11 @@ keycloak:
 logging:
   structured:
     format:
-      console: logstash
+      console:
   level:
     root: info
     net.lausi95.citygame: debug
+
+tenant:
+  override:
+    enabled: true
